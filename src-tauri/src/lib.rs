@@ -47,6 +47,8 @@ static ENABLE_KEYFIX: once_cell::sync::Lazy<Mutex<bool>> =
     once_cell::sync::Lazy::new(|| Mutex::new(true));
 static DEBOUNCE_INTERVAL_MS: once_cell::sync::Lazy<Mutex<u64>> =
     once_cell::sync::Lazy::new(|| Mutex::new(50));
+static BLOCKED_KEYPRESS_COUNT: once_cell::sync::Lazy<Mutex<u64>> =
+    once_cell::sync::Lazy::new(|| Mutex::new(0));
 
 // When this struct is dropped it will signal the hook thread to terminate
 struct HookThreadState {
@@ -94,6 +96,7 @@ unsafe extern "system" fn low_level_keyboard_proc(
                 .map_or(false, |last| now - *last < *debounce_interval_ms);
 
             if should_block {
+                *BLOCKED_KEYPRESS_COUNT.lock().unwrap() += 1;
                 println!("Blocked key: {:?}", vk_code);
                 return LRESULT(1);
             } else {
@@ -192,6 +195,11 @@ fn set_keyfix_enabled(enabled: bool) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn get_blocked_keypress_count() -> u64 {
+    *BLOCKED_KEYPRESS_COUNT.lock().unwrap()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let hook_thread_state = HookThreadState::new();
@@ -211,7 +219,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             set_debounce_interval,
-            set_keyfix_enabled
+            set_keyfix_enabled,
+            get_blocked_keypress_count
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

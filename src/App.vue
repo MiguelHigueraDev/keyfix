@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import Checkbox from "./components/checkbox.vue";
 import Slider from "./components/slider.vue";
+import KeypressCount from "./components/keypress-count.vue";
 
 const enableKeyfix = ref(true);
 const intervalMs = ref(50);
@@ -50,6 +51,10 @@ async function handleSliderChange() {
           Set the debounce delay in milliseconds. Lower values are more responsive but may not filter out all double
           keypresses.
         </p>
+      </div>
+
+      <div class="setting-section">
+        <KeypressCount />
       </div>
     </div>
   </main>
