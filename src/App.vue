@@ -47,8 +47,8 @@ async function handleSliderChange() {
       </div>
 
       <div class="setting-section">
-        <Slider v-model="intervalMs" id="debounce-interval" label="Debounce Interval" :min="5" :max="1000" :step="5"
-          unit="ms" @change="handleSliderChange" />
+        <Slider v-model="intervalMs" id="debounce-interval" label="Debounce Interval" :min="5" :max="200" :step="5"
+          unit="ms" :show-input="true" @change="handleSliderChange" />
         <p class="setting-description">
           Set the debounce delay in milliseconds. Lower values are more responsive but may not filter out all double
           keypresses.
