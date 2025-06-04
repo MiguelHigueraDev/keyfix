@@ -60,7 +60,6 @@ unsafe extern "system" fn low_level_keyboard_proc(
     unsafe { CallNextHookEx(hook_handle, n_code, w_param, l_param) }
 }
 
-/// Install and run the keyboard hook in a message loop
 pub fn run_keyboard_hook_loop(is_running_arc: Arc<AtomicBool>) -> Result<(), String> {
     println!("Starting global keyboard hook thread.");
 
@@ -102,7 +101,6 @@ pub fn run_keyboard_hook_loop(is_running_arc: Arc<AtomicBool>) -> Result<(), Str
     result
 }
 
-/// Run the Windows message loop for processing hook events
 fn run_message_loop(is_running_arc: Arc<AtomicBool>) -> Result<(), String> {
     let mut msg: MSG = MSG::default();
 
@@ -130,7 +128,6 @@ fn run_message_loop(is_running_arc: Arc<AtomicBool>) -> Result<(), String> {
     Ok(())
 }
 
-/// Clean up the keyboard hook
 fn cleanup_hook(hook_handle: HHOOK) {
     println!("Hook thread signaled to stop. Unhooking...");
 
@@ -142,7 +139,6 @@ fn cleanup_hook(hook_handle: HHOOK) {
             println!("Keyboard hook removed successfully.");
         }
 
-        // Clear the stored hook handle
         *HOOK_HANDLE_FOR_CALLBACK.lock().unwrap() = None;
     }
 

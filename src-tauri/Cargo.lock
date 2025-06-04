@@ -1857,8 +1857,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "keyfix-ui"
-version = "0.1.0"
+name = "keyfix"
+version = "1.2.0"
 dependencies = [
  "dashmap",
  "once_cell",

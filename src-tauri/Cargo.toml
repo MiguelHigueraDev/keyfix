@@ -1,6 +1,6 @@
 [package]
-name = "keyfix-ui"
-version = "0.1.0"
+name = "keyfix"
+version = "1.2.0"
 description = "Fix double keystrokes in faulty keyboard"
 authors = ["MiguelHigueraDev"]
 edition = "2021"
