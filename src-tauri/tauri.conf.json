@@ -12,9 +12,11 @@
   "app": {
     "windows": [
       {
-        "title": "keyfix-ui",
+        "title": "Keyfix Settings",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "resizable": false,
+        "maximizable": false
       }
     ],
     "security": {
