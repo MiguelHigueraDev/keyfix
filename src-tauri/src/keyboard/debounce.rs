@@ -1,14 +1,13 @@
 use dashmap::DashMap;
-use once_cell::sync::Lazy;
 use std::{
-    sync::Mutex,
+    sync::{LazyLock, Mutex},
     time::{SystemTime, UNIX_EPOCH},
 };
 
-pub static LAST_KEY_TIMES: Lazy<DashMap<u16, u64>> = Lazy::new(DashMap::new);
-pub static ENABLE_KEYFIX: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(true));
-pub static DEBOUNCE_INTERVAL_MS: Lazy<Mutex<u64>> = Lazy::new(|| Mutex::new(50));
-pub static BLOCKED_KEYPRESS_COUNT: Lazy<Mutex<u64>> = Lazy::new(|| Mutex::new(0));
+pub static LAST_KEY_TIMES: LazyLock<DashMap<u16, u64>> = LazyLock::new(DashMap::new);
+pub static ENABLE_KEYFIX: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(true));
+pub static DEBOUNCE_INTERVAL_MS: LazyLock<Mutex<u64>> = LazyLock::new(|| Mutex::new(50));
+pub static BLOCKED_KEYPRESS_COUNT: LazyLock<Mutex<u64>> = LazyLock::new(|| Mutex::new(0));
 
 pub fn should_block_key(vk_code: u16) -> bool {
     let keyfix_enabled = match ENABLE_KEYFIX.lock() {
