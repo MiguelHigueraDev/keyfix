@@ -79,6 +79,7 @@ unsafe extern "system" fn low_level_keyboard_proc(
         let vk_code = VIRTUAL_KEY(kbd_struct.vkCode as u16);
 
         if matches!(w_param.0 as u32, WM_KEYDOWN | WM_SYSKEYDOWN) {
+            // App is disabled, don't block keypresses
             if !ENABLE_KEYFIX.lock().unwrap().clone() {
                 return LRESULT(0);
             }
