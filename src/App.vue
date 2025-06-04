@@ -5,12 +5,13 @@ import Checkbox from "./components/checkbox.vue";
 import Slider from "./components/slider.vue";
 import KeypressCount from "./components/keypress-count.vue";
 
-const enableKeyfix = ref(true);
-const intervalMs = ref(50);
+const enableKeyfix = ref(localStorage.getItem("enableKeyfix") === "true");
+const intervalMs = ref(Number(localStorage.getItem("debounceInterval")) || 50);
 
 async function setDebounceInterval() {
   try {
     await invoke("set_debounce_interval", { intervalMs: Number(intervalMs.value) });
+    localStorage.setItem("debounceInterval", intervalMs.value.toString());
     console.log("Successfully set debounce interval");
   } catch (error) {
     console.error("Error setting debounce interval:", error);
@@ -20,6 +21,7 @@ async function setDebounceInterval() {
 async function toggleKeyfix() {
   try {
     await invoke("set_keyfix_enabled", { enabled: enableKeyfix.value });
+    localStorage.setItem("enableKeyfix", enableKeyfix.value.toString());
   } catch (error) {
     console.error("Error toggling keyfix:", error);
   }
