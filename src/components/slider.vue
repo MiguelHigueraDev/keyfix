@@ -9,12 +9,14 @@ interface Props {
     max?: number;
     step?: number;
     unit?: string;
+    showInput?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     min: 0,
     max: 100,
     step: 1,
+    showInput: false,
 });
 
 const emit = defineEmits<{
@@ -35,15 +37,33 @@ const handleChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     emit('change', Number(target.value));
 };
+
+const handleInputFieldChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    let value = Number(target.value);
+
+    if (value < props.min) value = props.min;
+    if (value > props.max) value = props.max;
+
+    value = Math.round(value / props.step) * props.step;
+    emit('update:modelValue', value);
+    emit('change', value);
+    target.value = value.toString();
+};
 </script>
 
 <template>
     <div class="slider-wrapper">
         <div class="slider-header">
             <label :for="id" class="slider-label">{{ label }}</label>
-            <div class="value-display">
+            <div class="value-display" v-if="!showInput">
                 <span class="value-number">{{ modelValue }}</span>
                 <span class="value-unit" v-if="unit">{{ unit }}</span>
+            </div>
+            <div class="input-wrapper" v-else>
+                <input type="number" :value="modelValue" @input="handleInputFieldChange" @blur="handleInputFieldChange"
+                    class="interval-input" :min="min" :max="max" :step="step" />
+                <span class="input-unit" v-if="unit">{{ unit }}</span>
             </div>
         </div>
         <div class="slider-container">
@@ -168,6 +188,37 @@ const handleChange = (event: Event) => {
     font-weight: 500;
 }
 
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.interval-input {
+    width: 80px;
+    padding: 8px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    background: white;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.interval-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-unit {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
 @media (prefers-color-scheme: dark) {
     .slider-label {
         color: #f9fafb;
@@ -187,6 +238,21 @@ const handleChange = (event: Event) => {
     }
 
     .slider-range {
+        color: #9ca3af;
+    }
+
+    .interval-input {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .interval-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .input-unit {
         color: #9ca3af;
     }
 }
