@@ -176,11 +176,6 @@ fn run_keyboard_hook_loop(is_running_arc: Arc<AtomicBool>) -> Result<(), String>
 }
 
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command]
 fn set_debounce_interval(interval_ms: u64) -> Result<(), String> {
     if interval_ms < 5 || interval_ms > 1000 {
         return Err("Interval must be between 5 and 1000 milliseconds.".to_string());
@@ -215,7 +210,6 @@ pub fn run() {
         })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
-            greet,
             set_debounce_interval,
             set_keyfix_enabled
         ])
