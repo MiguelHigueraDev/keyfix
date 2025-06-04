@@ -5,7 +5,7 @@ Only works on Windows.
 
 ## How to run
 
-1. Install Rust
+1. Install Rust, Node, and pnpm
 2. Clone the repo
 3. Run `pnpm install` to install all the frontend dependencies
 4. Then run `pnpm tauri dev` to start the development server and Rust application
