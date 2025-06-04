@@ -2,37 +2,49 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 
-const greetMsg = ref("");
-const name = ref("");
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+const enableKeyfix = ref(true);
+const intervalMs = ref(50);
+
+async function setDebounceInterval() {
+  try {
+    await invoke("set_debounce_interval", { intervalMs: Number(intervalMs.value) });
+    console.log("Successfully set debounce interval");
+  } catch (error) {
+    console.error("Error setting debounce interval:", error);
+  }
 }
+
+async function toggleKeyfix() {
+  try {
+    await invoke("set_keyfix_enabled", { enabled: enableKeyfix.value });
+  } catch (error) {
+    console.error("Error toggling keyfix:", error);
+  }
+}
+
 </script>
 
 <template>
   <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
+    <h1>Keyfix Settings</h1>
 
     <div class="row">
-      <a href="https://vite.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
+      <input type="checkbox" id="enable-keyfix" v-model="enableKeyfix" @change="toggleKeyfix" />
+      <label for="enable-keyfix">Enable Keyfix</label>
     </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
 
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
+    <div class="col">
+      <div class="row">
+        <input type="range" id="debounce-interval" v-model="intervalMs" min="5" max="1000"
+          @change="setDebounceInterval" />
+        <label for="debounce-interval">Debounce Interval (ms)</label>
+      </div>
+
+      <div class="row">
+        <p>{{ intervalMs }}</p>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -44,7 +56,6 @@ async function greet() {
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #249b73);
 }
-
 </style>
 <style>
 :root {
@@ -72,70 +83,21 @@ async function greet() {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
 .row {
   display: flex;
   justify-content: center;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 h1 {
   text-align: center;
 }
 
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -152,9 +114,9 @@ button {
     color: #ffffff;
     background-color: #0f0f0f98;
   }
+
   button:active {
     background-color: #0f0f0f69;
   }
 }
-
 </style>
