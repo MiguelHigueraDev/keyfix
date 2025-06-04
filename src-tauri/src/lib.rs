@@ -7,6 +7,11 @@ use std::{
 };
 
 use dashmap::DashMap;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    Manager,
+};
 use windows::{
     core::PCWSTR,
     Win32::{
@@ -207,14 +212,50 @@ pub fn run() {
 
     tauri::Builder::default()
         .manage(hook_thread_state)
-        .setup(move |_app| {
+        .setup(move |app| {
             // This thread will run independently of the Tauri main thread.
             std::thread::spawn(move || {
                 if let Err(e) = run_keyboard_hook_loop(is_running_clone) {
                     eprintln!("Error in keyboard hook thread: {}", e);
                 }
             });
+
+            // Tray icon with exit menu item
+            let exit_item = MenuItem::with_id(app, "exit", "Exit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&exit_item])?;
+
+            let _tray = TrayIconBuilder::new()
+                .menu(&menu)
+                .show_menu_on_left_click(false)
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "exit" => {
+                        app.exit(0);
+                    }
+                    _ => {}
+                })
+                .build(app)?;
             Ok(())
+        })
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                window.hide().unwrap();
+                api.prevent_close();
+            }
+        })
+        .on_tray_icon_event(|tray, event| match event {
+            TrayIconEvent::Click {
+                button: MouseButton::Left,
+                button_state: MouseButtonState::Up,
+                ..
+            } => {
+                let app = tray.app_handle();
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+            _ => {}
         })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
