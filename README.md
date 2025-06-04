@@ -2,7 +2,7 @@
 
 ![keyfix UI](github/keyfix.webp)
 
-Fix duplicate keypresses in a faulty keyboard by debouncing them. Debounce interval is can be adjusted.
+Fix duplicate keypresses in a faulty keyboard by debouncing them. Debounce interval can be adjusted.
 Only works on Windows.
 
 ## How to use
