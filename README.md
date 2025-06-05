@@ -32,6 +32,10 @@ Binaries will be outputted to `src-tauri/target/release`
 
 Contributions of any kind are always welcome. Feel free to clone the repo, make a new branch, and submit your changes in a PR. Thank you!
 
+## Credits
+
+Logo created by [iSlammedMyKindle](https://github.com/islammedmykindle)
+
 ## License
 
 MIT
