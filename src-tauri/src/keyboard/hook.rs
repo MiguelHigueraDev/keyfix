@@ -13,14 +13,15 @@ use windows::{
             WindowsAndMessaging::{
                 CallNextHookEx, DispatchMessageW, PeekMessageW, SetWindowsHookExW,
                 TranslateMessage, UnhookWindowsHookEx, HC_ACTION, HHOOK, KBDLLHOOKSTRUCT, MSG,
-                PM_REMOVE, WH_KEYBOARD_LL, WM_KEYDOWN, WM_QUIT, WM_SYSKEYDOWN,
+                PM_REMOVE, WH_KEYBOARD_LL, WM_KEYDOWN, WM_KEYUP, WM_QUIT, WM_SYSKEYDOWN,
+                WM_SYSKEYUP,
             },
         },
     },
 };
 
 use super::{
-    debounce::{increment_blocked_count, record_key_press, should_block_key},
+    debounce::{increment_blocked_count, reset_key_state, should_block_key},
     types::SafeHHook,
 };
 
@@ -49,9 +50,9 @@ unsafe extern "system" fn low_level_keyboard_proc(
             increment_blocked_count();
             println!("Blocked key: {:?}", vk_code);
             return LRESULT(1);
-        } else {
-            record_key_press(vk_code.0);
         }
+    } else if matches!(w_param.0 as u32, WM_KEYUP | WM_SYSKEYUP) {
+        reset_key_state(vk_code.0);
     }
 
     // Call the next hook in the chain
