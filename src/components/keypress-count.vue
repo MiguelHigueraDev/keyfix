@@ -22,7 +22,6 @@ function startPolling() {
     }, POLL_INTERVAL_MS);
 }
 
-// Stop polling
 function stopPolling() {
     if (pollInterval !== null) {
         clearInterval(pollInterval);
@@ -30,7 +29,6 @@ function stopPolling() {
     }
 }
 
-// Lifecycle hooks
 onMounted(() => {
     startPolling();
 });
