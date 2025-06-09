@@ -5,11 +5,18 @@ mod tray;
 
 use commands::*;
 use keyboard::run_keyboard_hook_loop;
+use single_instance::SingleInstance;
 use state::HookThreadState;
 use tray::{handle_tray_event, setup_tray};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let instance = SingleInstance::new("keyfix_lock").unwrap();
+
+    if !instance.is_single() {
+        std::process::exit(0);
+    }
+
     let hook_thread_state = HookThreadState::new();
     let is_running_clone = hook_thread_state.is_running.clone();
 
