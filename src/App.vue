@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { appWindow } from "@tauri-apps/api/window";
 import Checkbox from "./components/checkbox.vue";
 import Slider from "./components/slider.vue";
 import KeypressCount from "./components/keypress-count.vue";
 
 const enableKeyfix = ref(localStorage.getItem("enableKeyfix") === "true");
 const intervalMs = ref(Number(localStorage.getItem("debounceInterval")) || 50);
+const startMinimized = ref(localStorage.getItem("startMinimized") === "true");
 
 async function setDebounceInterval() {
   try {
@@ -26,6 +28,16 @@ async function toggleKeyfix() {
     console.error("Error toggling keyfix:", error);
   }
 }
+
+function toggleStartMinimized() {
+  localStorage.setItem("startMinimized", startMinimized.value.toString());
+}
+
+onMounted(() => {
+  if (startMinimized.value) {
+    appWindow.hide();
+  }
+});
 
 async function handleSliderChange() {
   await setDebounceInterval();
@@ -52,6 +64,13 @@ async function handleSliderChange() {
         <p class="setting-description">
           Set the debounce delay in milliseconds. Lower values are more responsive but may not filter out all double
           keypresses.
+        </p>
+      </div>
+
+      <div class="setting-section">
+        <Checkbox v-model="startMinimized" id="start-minimized" label="Start minimized" @update:modelValue="toggleStartMinimized" />
+        <p class="setting-description">
+          Launch the app hidden in the system tray.
         </p>
       </div>
 

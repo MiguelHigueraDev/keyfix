@@ -12,6 +12,7 @@ Only works on Windows.
 3. Done!
 
 The app will continue to run in the background if the window is closed, to completely close go to your system tray and right click it.
+To automatically launch hidden in the tray, enable **Start minimized** from the application's settings.
 
 ## Development instructions
 
