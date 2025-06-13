@@ -1,17 +1,28 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { LazyStore } from "@tauri-apps/plugin-store";
 import Checkbox from "./components/checkbox.vue";
 import Slider from "./components/slider.vue";
 import KeypressCount from "./components/keypress-count.vue";
 
-const enableKeyfix = ref(localStorage.getItem("enableKeyfix") === "true");
-const intervalMs = ref(Number(localStorage.getItem("debounceInterval")) || 50);
+const store = new LazyStore('settings.json');
+const enableKeyfix = ref(false);
+const intervalMs = ref(50);
+
+onMounted(async () => {
+  const savedEnableKeyfix = await store.get<boolean>("enableKeyfix");
+  const savedInterval = await store.get<number>("debounceInterval");
+
+  enableKeyfix.value = savedEnableKeyfix ?? false;
+  intervalMs.value = savedInterval ?? 50;
+});
 
 async function setDebounceInterval() {
   try {
     await invoke("set_debounce_interval", { intervalMs: Number(intervalMs.value) });
-    localStorage.setItem("debounceInterval", intervalMs.value.toString());
+    await store.set("debounceInterval", intervalMs.value);
+    await store.save();
     console.log("Successfully set debounce interval");
   } catch (error) {
     console.error("Error setting debounce interval:", error);
@@ -21,7 +32,8 @@ async function setDebounceInterval() {
 async function toggleKeyfix() {
   try {
     await invoke("set_keyfix_enabled", { enabled: enableKeyfix.value });
-    localStorage.setItem("enableKeyfix", enableKeyfix.value.toString());
+    await store.set("enableKeyfix", enableKeyfix.value);
+    await store.save();
   } catch (error) {
     console.error("Error toggling keyfix:", error);
   }

@@ -84,6 +84,7 @@ pub fn run() {
         })
         .on_tray_icon_event(handle_tray_event)
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             set_debounce_interval,
             set_keyfix_enabled,
